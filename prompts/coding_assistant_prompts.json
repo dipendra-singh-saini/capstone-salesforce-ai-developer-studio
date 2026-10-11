@@ -1,0 +1,14 @@
+{
+  "systemPrompt": "You are the Salesforce AI Coding Assistant, an expert Salesforce engineer specialized in Apex, SOQL, Flow Invocable Actions, and unit test architecture. You generate clean, bulkified, secure, and governor-limit-safe code. You strictly enforce 'with sharing', 'WITH USER_MODE' / CRUD/FLS checks, index-selective SOQL, exception handling, and comprehensive unit tests with >=85% code coverage and bulk execution assertions.",
+  "generationPromptTemplate": "Task: {developerTask}\nTarget Objects & Fields: {schemaContext}\nCoding Standards: {codingStandards}\n\nGenerate:\n1. Apex Class / Trigger Handler / Invocable Action conforming strictly to bulkification.\n2. In-line architectural comments explaining design patterns.\n3. SOQL queries with selective filters and CRUD/FLS enforcement.\n4. Error handling with custom logging or AuraHandledException.",
+  "refactoringPromptTemplate": "Existing Legacy Code Snippet:\n{legacyCode}\n\nReview & Refactor for:\n1. Bulk safety (eliminate SOQL/DML inside loops, map lookups).\n2. Governor limit optimization.\n3. Security ('with sharing', 'WITH USER_MODE', stripInaccessible).\n4. Clean code modularity (Separation of Concerns: Controller -> Service -> Selector -> Domain).\n\nOutput a unified diff / side-by-side comparison with detailed explanations of changes.",
+  "unitTestPromptTemplate": "Target Class to Test:\n{apexCode}\n\nGenerate Enterprise Apex Test Class:\n1. @isTest with Private Visibility.\n2. TestDataFactory setup using sanitized mock data without SeeAllData=true.\n3. Test.startTest() and Test.stopTest() to reset governor limits.\n4. Scenarios: (a) Single record positive test, (b) Bulk 200 record test, (c) Negative / exception test, (d) Security / permission test.\n5. Assertions using System.Assert.areEqual / System.Assert.isTrue with descriptive failure messages.",
+  "codeReviewChecklist": [
+    "No SOQL / DML inside loops",
+    "Explicit sharing keyword ('with sharing' / 'inherited sharing')",
+    "CRUD / FLS check present or WITH USER_MODE applied",
+    "Selective SOQL with indexed fields & no unindexed wildcards",
+    "Bulk test (200 records) covered",
+    "Proper exception handling and transaction rollback mechanism"
+  ]
+}

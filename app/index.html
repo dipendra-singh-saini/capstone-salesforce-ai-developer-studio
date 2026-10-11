@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salesforce AI Developer Studio | Capstone PoC</title>
+  <meta name="description" content="AI Enablement PoC: Salesforce Solution Planning Agent and Apex/SOQL Coding Assistant">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-dark">
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-text">
+          <h2>SF AI Studio</h2>
+          <span class="badge badge-primary">Developer PoC</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <div class="nav-section-title">CAPSTONE TRACKS</div>
+        <button class="nav-btn active" id="nav-planning" onclick="switchTab('planning')">
+          <span class="icon">🧭</span>
+          <span>1. Solution Planning Agent</span>
+        </button>
+        <button class="nav-btn" id="nav-coding" onclick="switchTab('coding')">
+          <span class="icon">💻</span>
+          <span>2. Apex & SOQL Coding Studio</span>
+        </button>
+        <button class="nav-btn" id="nav-audit" onclick="switchTab('audit')">
+          <span class="icon">🛡️</span>
+          <span>3. Security & Governor Linter</span>
+        </button>
+        
+        <div class="nav-section-title">KNOWLEDGE & DELIVERABLES</div>
+        <button class="nav-btn" id="nav-schema" onclick="switchTab('schema')">
+          <span class="icon">📦</span>
+          <span>Mock Schema Explorer</span>
+        </button>
+        <button class="nav-btn" id="nav-docs" onclick="switchTab('docs')">
+          <span class="icon">📑</span>
+          <span>Capstone Deliverables</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="governance-card">
+          <div class="gov-title">🔒 Guardrail Active</div>
+          <p>Zero direct org mutations. Sanitized mock metadata only.</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <h1 id="page-title">Use Case 1: Salesforce Solution Planning Agent</h1>
+          <p id="page-subtitle">Translate user stories into declarative/programmatic architectures with governor safety reviews.</p>
+        </div>
+        <div class="header-right">
+          <button class="btn btn-secondary" onclick="loadSampleScenario()">⚡ Load Scenario</button>
+          <button class="btn btn-primary" onclick="exportDeliverables()">📥 Export Handoff</button>
+        </div>
+      </header>
+
+      <!-- TAB 1: SOLUTION PLANNING AGENT -->
+      <section id="tab-planning" class="tab-content active">
+        <div class="grid-2col">
+          <!-- Input Card -->
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3>📝 Requirement Input & Acceptance Criteria</h3>
+              <span class="badge badge-info">Step 1 & 2: Context Extraction</span>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label for="plan-user-story">User Story</label>
+                <textarea id="plan-user-story" rows="3" placeholder="e.g. As a Support Lead, when a Case is created for a VIP Account..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="plan-criteria">Acceptance Criteria</label>
+                <textarea id="plan-criteria" rows="4" placeholder="1. If Account Tier is 'VIP', Case Priority = 'Critical'&#10;2. Query active Service Contract..."></textarea>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group half">
+                  <label for="plan-profile">Persona / Profile</label>
+                  <select id="plan-profile">
+                    <option value="Customer Support Agent">Customer Support Agent</option>
+                    <option value="Support Operations Lead">Support Operations Lead</option>
+                    <option value="System Administrator">System Administrator</option>
+                  </select>
+                </div>
+                <div class="form-group half">
+                  <label for="plan-volume">Expected Transaction Volume</label>
+                  <select id="plan-volume">
+                    <option value="High (Bulk 200 API Batch)">High (Bulk 200 API Batch)</option>
+                    <option value="Standard UI Single Record">Standard UI Single Record</option>
+                    <option value="Nightly Scheduled Batch">Nightly Scheduled Batch</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="btn-group">
+                <button class="btn btn-primary" onclick="generateSolutionPlan()">🚀 Run Solution Planning Agent</button>
+                <button class="btn btn-outline" onclick="detectClarifications()">❓ Detect Ambiguities</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Clarifications & Guardrail Checks -->
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3>🔍 Clarification & Ambiguity Detector</h3>
+              <span class="badge badge-warning" id="clarification-badge">Interactive Review</span>
+            </div>
+            <div class="card-body">
+              <div id="clarifications-list" class="clarification-box">
+                <p class="text-muted">Click <strong>"Detect Ambiguities"</strong> or <strong>"Load Scenario"</strong> to check for missing context.</p>
+              </div>
+
+              <div class="guardrail-status-box">
+                <h4>🛡️ OWASP LLM Guardrails & Schema Grounding</h4>
+                <ul class="guardrail-checklist">
+                  <li id="chk-grounding">✅ Context Grounding: Verified against <code>mock_schema.json</code></li>
+                  <li id="chk-llm01">✅ LLM01: Prompt injection sanitized</li>
+                  <li id="chk-llm06">✅ LLM06: Zero PII / credentials in prompt</li>
+                  <li id="chk-human">✅ Human-in-the-Loop: Developer sign-off required</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generated Solution Output -->
+        <div class="card glass-card full-width mt-4" id="plan-output-card">
+          <div class="card-header">
+            <h3>🏗️ Architecture Recommendation & Build Checklist</h3>
+            <div class="header-badges">
+              <span class="badge badge-success" id="tradeoff-badge">Hybrid Architecture</span>
+              <span class="badge badge-primary" id="readiness-badge">Readiness Score: 100%</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="plan-result-container" class="output-container">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: APEX & SOQL CODING STUDIO -->
+      <section id="tab-coding" class="tab-content">
+        <div class="grid-2col">
+          <!-- Code Task & Input -->
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3>💻 Developer Task & Legacy Code</h3>
+              <div class="header-badges">
+                <select id="coding-task-select" onchange="onTaskSelectChange()">
+                  <option value="refactor">Refactor Legacy Trigger Snippet</option>
+                  <option value="invocable">Generate Invocable Apex Action</option>
+                  <option value="selective-soql">Optimize Selective SOQL Query</option>
+                </select>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label for="coding-prompt">Task Objective</label>
+                <input type="text" id="coding-prompt" value="Refactor non-bulkified legacy Case trigger into enterprise service pattern with zero SOQL in loops.">
+              </div>
+
+              <div class="form-group">
+                <label for="legacy-code-input">Legacy / Draft Apex Code</label>
+                <textarea id="legacy-code-input" class="code-editor" rows="12"></textarea>
+              </div>
+
+              <div class="btn-group">
+                <button class="btn btn-primary" onclick="refactorAndGenerateCode()">✨ Refactor & Bulkify Code</button>
+                <button class="btn btn-secondary" onclick="generateTestClass()">🧪 Generate Unit Test Class</button>
+                <button class="btn btn-outline" onclick="runCodeAuditNow()">🔍 Run Security Audit</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Generated Code & Diff Viewer -->
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3>⚡ Refactored Apex & Companion Test Class</h3>
+              <span class="badge badge-success" id="code-status-badge">Bulk Safe</span>
+            </div>
+            <div class="card-body">
+              <div class="tab-subnav">
+                <button class="subtab-btn active" onclick="switchSubTab('refactored')">Refactored Class</button>
+                <button class="subtab-btn" onclick="switchSubTab('testclass')">Unit Test Class (>=85%)</button>
+                <button class="subtab-btn" onclick="switchSubTab('soql')">SOQL Analyzer</button>
+              </div>
+
+              <div id="subtab-refactored" class="subtab-content active">
+                <pre class="code-block"><code id="code-output-refactored">// Refactored code will appear here...</code></pre>
+              </div>
+              <div id="subtab-testclass" class="subtab-content">
+                <pre class="code-block"><code id="code-output-test">// Companion unit test will appear here...</code></pre>
+              </div>
+              <div id="subtab-soql" class="subtab-content">
+                <pre class="code-block"><code id="code-output-soql">// SOQL optimization analysis will appear here...</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: SECURITY & GOVERNOR LINTER -->
+      <section id="tab-audit" class="tab-content">
+        <div class="card glass-card">
+          <div class="card-header">
+            <h3>🛡️ Real-Time Salesforce AST & Rule Verifier</h3>
+            <span class="badge badge-info">Rule Engine: Active</span>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label for="audit-code-input">Paste Apex / SOQL Snippet to Audit:</label>
+              <textarea id="audit-code-input" class="code-editor" rows="10"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="runDirectAudit()">🚀 Evaluate Code Against Salesforce Standards</button>
+
+            <div class="audit-results mt-4" id="audit-results-box">
+              <!-- Audit findings populated here -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: MOCK SCHEMA EXPLORER -->
+      <section id="tab-schema" class="tab-content">
+        <div class="card glass-card">
+          <div class="card-header">
+            <h3>📦 Grounded Mock Salesforce Metadata Catalog</h3>
+            <span class="badge badge-success">Sanitized Schema</span>
+          </div>
+          <div class="card-body">
+            <div id="schema-tree-container">
+              <!-- Rendered Schema Trees -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: CAPSTONE DELIVERABLES -->
+      <section id="tab-docs" class="tab-content">
+        <div class="card glass-card">
+          <div class="card-header">
+            <h3>📑 Capstone Submission Deliverables Pack</h3>
+            <span class="badge badge-primary">Rubric Complete</span>
+          </div>
+          <div class="card-body">
+            <div class="deliverables-grid">
+              <div class="doc-card" onclick="viewDoc('architecture')">
+                <div class="doc-icon">📐</div>
+                <h4>Architecture & Design Spec</h4>
+                <p>Mermaid system flowcharts, LLM guardrails, and human approval gates.</p>
+                <span class="doc-link">View Document &rarr;</span>
+              </div>
+
+              <div class="doc-card" onclick="viewDoc('prompts')">
+                <div class="doc-icon">💬</div>
+                <h4>Prompt Design Pack</h4>
+                <p>System prompts, role instructions, input templates, and validation checklist.</p>
+                <span class="doc-link">View Document &rarr;</span>
+              </div>
+
+              <div class="doc-card" onclick="viewDoc('samples')">
+                <div class="doc-icon">🧪</div>
+                <h4>Sample Outputs (5 Tasks)</h4>
+                <p>CaseService, Selective SOQL, Trigger Refactor, Invocable Action, Audit.</p>
+                <span class="doc-link">View Document &rarr;</span>
+              </div>
+
+              <div class="doc-card" onclick="viewDoc('quality')">
+                <div class="doc-icon">✅</div>
+                <h4>Quality & Risk Checklist</h4>
+                <p>Evidence for bulkification, CRUD/FLS, sharing models, and OWASP LLM risks.</p>
+                <span class="doc-link">View Document &rarr;</span>
+              </div>
+
+              <div class="doc-card" onclick="viewDoc('reflection')">
+                <div class="doc-icon">📝</div>
+                <h4>Reflection & Limitations Note</h4>
+                <p>Where AI excelled, failure modes, and developer-owned responsibilities.</p>
+                <span class="doc-link">View Document &rarr;</span>
+              </div>
+            </div>
+
+            <div id="doc-viewer-container" class="doc-viewer mt-4" style="display: none;">
+              <div class="doc-viewer-header">
+                <h3 id="doc-viewer-title">Document Title</h3>
+                <button class="btn btn-sm btn-outline" onclick="closeDocViewer()">✕ Close</button>
+              </div>
+              <div class="doc-viewer-body" id="doc-viewer-content">
+                <!-- Document markdown/text -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

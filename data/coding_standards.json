@@ -1,0 +1,71 @@
+{
+  "governorLimits": {
+    "soqlQueriesSynchronous": 100,
+    "soqlQueriesAsynchronous": 200,
+    "dmlStatementsSynchronous": 150,
+    "dmlRows": 10000,
+    "soqlQueryRows": 50000,
+    "heapSizeMB": 6,
+    "cpuTimeMS": 10000
+  },
+  "rules": {
+    "bulkification": {
+      "id": "SF-RULE-001",
+      "severity": "CRITICAL",
+      "title": "Avoid DML and SOQL Inside Loops",
+      "description": "Never place database queries (SOQL) or DML operations inside for/while loops. Always aggregate records into Lists/Maps and perform bulk operations outside loops."
+    },
+    "crudFlsEnforcement": {
+      "id": "SF-RULE-002",
+      "severity": "CRITICAL",
+      "title": "Enforce CRUD/FLS Permissions",
+      "description": "Ensure queries use 'WITH USER_MODE' or 'WITH SECURITY_ENFORCED' or 'Security.stripInaccessible()' before processing DML or reading sensitive fields."
+    },
+    "sharingModel": {
+      "id": "SF-RULE-003",
+      "severity": "HIGH",
+      "title": "Explicit Class Sharing Declaration",
+      "description": "Every Apex class must explicitly declare 'with sharing', 'without sharing', or 'inherited sharing'. Defaulting to unspecified sharing creates security vulnerabilities."
+    },
+    "soqlSelectivity": {
+      "id": "SF-RULE-004",
+      "severity": "HIGH",
+      "title": "Selective SOQL Query Filters",
+      "description": "Filter SOQL queries using indexed fields (Id, Name, external IDs, lookup/master-detail fields) and avoid leading wildcards ('%text') or negative operators (!=, NOT LIKE) on large tables."
+    },
+    "testCoverageAndQuality": {
+      "id": "SF-RULE-005",
+      "severity": "HIGH",
+      "title": "Robust Unit Test Assertions & Bulk Tests",
+      "description": "Unit tests must use Test.startTest() / Test.stopTest(), verify positive, negative, and bulk (200 records) scenarios, avoid SeeAllData=true, and include System.assertEquals / System.Assert statements."
+    },
+    "declarativeFirst": {
+      "id": "SF-RULE-006",
+      "severity": "MEDIUM",
+      "title": "Declarative vs Programmatic Rule",
+      "description": "Prefer Salesforce Flow for standard record orchestration, simple branching, and email alerts. Reserve Apex for complex transactional logic, high-volume processing, custom integrations, or fine-grained governor control."
+    }
+  },
+  "owaspLlmRisks": [
+    {
+      "code": "LLM01",
+      "name": "Prompt Injection",
+      "mitigation": "Sanitize user inputs, strip directive escape sequences, enforce strict schema contracts."
+    },
+    {
+      "code": "LLM02",
+      "name": "Insecure Output Handling",
+      "mitigation": "Do not execute AI code directly in production. Require human-in-the-loop review and static linting."
+    },
+    {
+      "code": "LLM06",
+      "name": "Sensitive Information Disclosure",
+      "mitigation": "Strictly scrub PII, production tokens, API keys, and customer data before feeding into AI prompts."
+    },
+    {
+      "code": "LLM09",
+      "name": "Overreliance / Schema Hallucination",
+      "mitigation": "Cross-reference generated object and field names against validated org metadata dictionary."
+    }
+  ]
+}

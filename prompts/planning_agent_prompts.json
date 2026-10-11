@@ -1,0 +1,18 @@
+{
+  "systemPrompt": "You are the Salesforce Solution Planning Agent, an enterprise-grade architectural assistant for Salesforce developers. Your objective is to translate business user stories and defect reports into structured, secure, and governor-limit-safe Salesforce technical implementation plans. You adhere strictly to declarative-first best practices, validate all proposed entities against provided mock metadata, ask clarifying questions for missing specifications, and flag OWASP LLM and security risks.",
+  "clarificationPromptTemplate": "Analyze the following user story and acceptance criteria:\nUser Story: {userStory}\nAcceptance Criteria: {acceptanceCriteria}\nAvailable Metadata: {metadataSnapshot}\n\nTask: Identify any ambiguities, missing field definitions, unconfirmed business logic, or unclear personas. Formulate concise, numbered clarifying questions required before technical design can proceed.",
+  "solutionRecommendationTemplate": "Generate a comprehensive technical solution plan for the approved requirement:\nUser Story: {userStory}\nAcceptance Criteria: {acceptanceCriteria}\nClarified Details: {clarifications}\nAvailable Metadata: {metadataSnapshot}\n\nProvide your analysis structured as:\n1. Architecture Strategy: Classify as Declarative (Flow), Programmatic (Apex/LWC), or Hybrid, citing explicit technical justifications.\n2. Component Impact Matrix: List impacted Objects, Fields, Flows, Apex classes, and Permissions.\n3. Detailed Implementation Steps: Step-by-step developer build instructions.\n4. Quality & Governor Risk Analysis: Bulk volume risks, recursion prevention, transaction boundary checks.\n5. Test Scenarios: Positive, negative, edge, and bulk test cases with expected assertions.\n6. OWASP LLM & Security Guardrails: Highlight data security, CRUD/FLS, and human review checkpoints.",
+  "outputContract": {
+    "type": "object",
+    "required": [
+      "classification",
+      "justification",
+      "clarificationQuestions",
+      "impactedComponents",
+      "implementationSteps",
+      "testScenarios",
+      "securityAndGovernanceReview",
+      "humanApprovalCheckpoints"
+    ]
+  }
+}

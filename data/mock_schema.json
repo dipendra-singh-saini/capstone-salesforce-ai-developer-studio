@@ -1,0 +1,133 @@
+{
+  "objects": {
+    "Case": {
+      "label": "Case",
+      "apiName": "Case",
+      "description": "Standard object to track customer issues and requests.",
+      "fields": {
+        "Id": {"type": "id", "label": "Case ID", "readOnly": true},
+        "CaseNumber": {"type": "string", "label": "Case Number", "readOnly": true},
+        "AccountId": {"type": "reference", "referenceTo": ["Account"], "label": "Account ID"},
+        "ContactId": {"type": "reference", "referenceTo": ["Contact"], "label": "Contact ID"},
+        "Subject": {"type": "string", "length": 255, "label": "Subject"},
+        "Description": {"type": "textarea", "label": "Description"},
+        "Status": {
+          "type": "picklist",
+          "label": "Status",
+          "values": ["New", "In Progress", "Pending Customer", "Escalated", "Closed"]
+        },
+        "Priority": {
+          "type": "picklist",
+          "label": "Priority",
+          "values": ["Low", "Medium", "High", "Critical"]
+        },
+        "Type": {
+          "type": "picklist",
+          "label": "Type",
+          "values": ["Technical Support", "Billing", "Feature Request", "Bug"]
+        },
+        "Origin": {
+          "type": "picklist",
+          "label": "Case Origin",
+          "values": ["Email", "Phone", "Web", "Chat", "Portal"]
+        },
+        "IsEscalated": {"type": "boolean", "label": "Escalated"},
+        "Service_Contract__c": {
+          "type": "reference",
+          "referenceTo": ["Service_Contract__c"],
+          "label": "Service Contract"
+        },
+        "SLA_Status__c": {
+          "type": "picklist",
+          "label": "SLA Status",
+          "values": ["Compliant", "Warning", "Breached"]
+        },
+        "Resolution_Summary__c": {"type": "textarea", "label": "Resolution Summary"},
+        "Total_Milestones__c": {"type": "number", "label": "Total Milestones", "precision": 18, "scale": 0},
+        "CreatedDate": {"type": "datetime", "label": "Created Date", "readOnly": true},
+        "ClosedDate": {"type": "datetime", "label": "Closed Date", "readOnly": true}
+      }
+    },
+    "Account": {
+      "label": "Account",
+      "apiName": "Account",
+      "description": "Standard object representing customer organizations.",
+      "fields": {
+        "Id": {"type": "id", "label": "Account ID", "readOnly": true},
+        "Name": {"type": "string", "length": 255, "label": "Account Name", "indexed": true},
+        "Type": {
+          "type": "picklist",
+          "label": "Type",
+          "values": ["Customer - Direct", "Customer - Channel", "Prospect", "Partner"]
+        },
+        "Tier__c": {
+          "type": "picklist",
+          "label": "Support Tier",
+          "values": ["Standard", "Gold", "Platinum", "VIP"]
+        },
+        "Active_Contracts_Count__c": {"type": "number", "label": "Active Contracts Count"},
+        "VIP_Routing_Enabled__c": {"type": "boolean", "label": "VIP Routing Enabled"}
+      }
+    },
+    "Contact": {
+      "label": "Contact",
+      "apiName": "Contact",
+      "description": "Standard object representing customer individuals.",
+      "fields": {
+        "Id": {"type": "id", "label": "Contact ID", "readOnly": true},
+        "AccountId": {"type": "reference", "referenceTo": ["Account"], "label": "Account ID"},
+        "FirstName": {"type": "string", "length": 40, "label": "First Name"},
+        "LastName": {"type": "string", "length": 80, "label": "Last Name", "indexed": true},
+        "Email": {"type": "email", "label": "Email", "indexed": true},
+        "Phone": {"type": "phone", "label": "Phone"}
+      }
+    },
+    "Service_Contract__c": {
+      "label": "Service Contract",
+      "apiName": "Service_Contract__c",
+      "description": "Custom object representing customer SLA terms and contracted support.",
+      "fields": {
+        "Id": {"type": "id", "label": "Record ID", "readOnly": true},
+        "Name": {"type": "string", "length": 80, "label": "Contract Number"},
+        "AccountId__c": {"type": "reference", "referenceTo": ["Account"], "label": "Account", "indexed": true},
+        "Status__c": {
+          "type": "picklist",
+          "label": "Status",
+          "values": ["Draft", "Active", "Expired", "Suspended"]
+        },
+        "Response_SLA_Hours__c": {"type": "number", "label": "Response SLA (Hours)", "precision": 5, "scale": 2},
+        "Resolution_SLA_Hours__c": {"type": "number", "label": "Resolution SLA (Hours)", "precision": 5, "scale": 2},
+        "Start_Date__c": {"type": "date", "label": "Start Date"},
+        "End_Date__c": {"type": "date", "label": "End Date"}
+      }
+    },
+    "Case_Milestone__c": {
+      "label": "Case Milestone",
+      "apiName": "Case_Milestone__c",
+      "description": "Custom object tracking milestone checkpoints for case resolution.",
+      "fields": {
+        "Id": {"type": "id", "label": "Record ID", "readOnly": true},
+        "CaseId__c": {"type": "reference", "referenceTo": ["Case"], "label": "Case", "indexed": true},
+        "Milestone_Type__c": {
+          "type": "picklist",
+          "label": "Milestone Type",
+          "values": ["First Response", "Technical Diagnosis", "Customer Verification", "Resolution"]
+        },
+        "Target_Date__c": {"type": "datetime", "label": "Target Date"},
+        "Completion_Date__c": {"type": "datetime", "label": "Completion Date"},
+        "Is_Violated__c": {"type": "boolean", "label": "Violated"}
+      }
+    }
+  },
+  "profiles": [
+    "System Administrator",
+    "Customer Support Agent",
+    "Support Operations Lead",
+    "Read Only Support User"
+  ],
+  "existingComponents": {
+    "triggers": ["CaseTrigger.trigger"],
+    "classes": ["CaseTriggerHandler.cls", "CaseService.cls", "CaseSelector.cls"],
+    "flows": ["Case_Auto_Notification_Flow", "VIP_Customer_Alert_Flow"]
+  }
+}
